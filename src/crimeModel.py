@@ -38,6 +38,13 @@ class crimeModel:
       df["latitud"] = pd.to_numeric(df["latitud"], errors='coerce')
       df["longitud"] =pd.to_numeric(df["longitud"], errors='coerce')
       df['dia']= pd.to_numeric(df["dia"])
+
+
+      self.conductas = uniques_conducta
+
+      # Delete records out of AMB
+      df = df.loc[(df['latitud']>= 6) & (df['latitud'] <= 8)]
+      df = df.loc[(df['longitud'] >= -74) & (df['longitud'] <=-72)]
       
       df['mes'] = df['mes'].apply(lambda x: x+1)
       df['dia_semana'] = df['dia_semana'].apply(lambda x: x+1)
@@ -78,7 +85,7 @@ class crimeModel:
     Should Respect that order, in other case model misunderstand data
     '''
     p = self.model.predict(np.reshape(lista, (1, 4)))[0]
-    pFormal = { 'lat': p[0], 'lng':p[1], 'conduct':int(p[2])}
+    pFormal = { 'lat': p[0], 'lng':p[1], 'conduct':self.conductas[int(p[2])]}
     return pFormal
     
           
