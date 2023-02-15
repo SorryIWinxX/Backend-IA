@@ -20,18 +20,33 @@ collection = db["server"]
 model = crimeModel()
 
 
-@app.route("/service", methods=["POST"])
+@app.route("/service", methods=["POST","GET","OPTIONS"])
 
 
 def index():
-    if request.method == "POST":
+    if request.method == "POST" or request.method == "OPTIONS":
 
         post_data = request.get_json()
+        
+        print("-------")
+        
+        
         collection.insert_one(post_data)
 
+        results = collection.find()
 
-        return "Post saved successfully!"
 
+        df = pd.DataFrame(list(results))
+        df = df.drop('_id', axis=1)
+
+        model_df = df.iloc[-1]
+
+
+        p = model.crimePrediction(list(model_df))
+        print(df)
+    
+
+        return p
 
     return "Welcome to my Flask and MongoDB Atlas application!"
 
@@ -39,32 +54,20 @@ def index():
 @app.route('/consulta', methods=["GET"])
 
 def consulta():
-    # Obtén la colección donde se encuentran los datos que deseas consultar
-
-    # Define los filtros de búsqueda para la consulta
-
     
-
-    # Realiza la consulta a la base de datos utilizando los filtros definidos
     results = collection.find()
 
 
-    # Crea un dataframe a partir de los resultados obtenidos
     df = pd.DataFrame(list(results))
     df = df.drop('_id', axis=1)
 
-    model_df = df.loc[2]
+    model_df = df.iloc[-1]
 
 
     p = model.crimePrediction(list(model_df))
     print(df)
-
-    # Devuelve el dataframe al cliente
-    return p 
-
-
-
-
+    
+    return p
 
 if __name__ == "__main__":
     app.run()
